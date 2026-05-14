@@ -7,7 +7,7 @@ var lvl_one_map = [
     { name: "ceiling", height: 2000, width: 2000, posX: 0, posY: -100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "green", opacity: 0.5 },
     { name: "right wall", height: 200, width: 2000, posX: 1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "blue", opacity: 0.5 },
     { name: "left wall", height: 200, width: 2000, posX: -1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "orange", opacity: 0.5 },
-    { name: "front wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: 1000, rotX: 0, rotY: 0, rotZ: 0, color: "#ecc0d1", opacity: 0.5 },
+    // { name: "front wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: 1000, rotX: 0, rotY: 0, rotZ: 0, color: "#ecc0d1", opacity: 0.5 },
     { name: "hinter wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: -1000, rotX: 0, rotY: 0, rotZ: 0, color: "yellow", opacity: 0.5 },
 ];
 
@@ -24,7 +24,7 @@ function createWorld(map) {
             translate3d(
                 ${map[i].posX + myWorld.clientWidth / 2 - map[i].width / 2}px, 
                 ${map[i].posY + myWorld.clientHeight / 2 - map[i].height / 2}px, 
-                ${map[i].posZ}px
+                ${-map[i].posZ}px
             ) 
             RotateX(${map[i].rotX}deg) 
             RotateY(${map[i].rotY}deg) 
