@@ -9,7 +9,7 @@ var lvl_one_map = [
     { name: "left wall", height: 200, width: 2000, posX: -1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "orange", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"},
     { name: "front wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: 1000, rotX: 0, rotY: 0, rotZ: 0, color: "#ecc0d1", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"},
     { name: "hinter wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: -1000, rotX: 0, rotY: 0, rotZ: 0, color: "yellow", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "wall001", height: 200, width: 200, posX: 0, posY: 0, posZ: 0, rotX: 0, rotY: 0, rotZ: 0, color: "black", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"}
+    { name: "wall001", height: 200, width: 200, posX: 0, posY: 0, posZ: 0, rotX: 0, rotY: 0, rotZ: 0, color: "black", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"},
 ];
 
 function createWorld(map) {
