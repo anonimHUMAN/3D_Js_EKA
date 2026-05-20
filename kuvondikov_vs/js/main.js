@@ -3,13 +3,23 @@ var myContainer = document.getElementById("container");
 var myWorld = document.getElementById("world");
 
 var lvl_one_map = [
-    { name: "floor", height: 2000, width: 2000, posX: 0, posY: 100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "black", opacity: 0.5},
-    { name: "ceiling", height: 2000, width: 2000, posX: 0, posY: -100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "black", opacity: 0.5 },
-    { name: "right wall", height: 200, width: 2000, posX: 1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "black", opacity: 0.5 },
-    { name: "left wall", height: 200, width: 2000, posX: -1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "black", opacity: 0.5 },
-    /* { name: "front wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: 1000, rotX: 0, rotY: 0, rotZ: 0, color: "#000000", opacity: 0.5 },  */
-    { name: "hinter wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: -1000, rotX: 0, rotY: 0, rotZ: 0, color: "black", opacity: 0.5 },
-    { name: "wall001", height: 200, width: 200, posX: 0, posY: 0, posZ: 0, rotX: 0, rotY: 0, rotZ: 0, color: "black", opacity: 0.5}
+    { name: "floor", height: 2000, width: 2000, posX: 0, posY: 100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "violet", opacity: 0.8},
+    { name: "ceiling", height: 2000, width: 2000, posX: 0, posY: -100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "brown", opacity: 0.8 },
+    { name: "right wall", height: 200, width: 2000, posX: 1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "blue", opacity: 0.8 },
+    { name: "left wall", height: 200, width: 2000, posX: -1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "orange", opacity: 0.8 },
+    // { name: "front wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: 1000, rotX: 0, rotY: 0, rotZ: 0, color: "#ecc0d1", opacity: 0.5 },
+    { name: "hinter wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: -1000, rotX: 0, rotY: 0, rotZ: 0, color: "yellow", opacity: 0.5 },
+    { name: "wall001", height: 200, width: 200, posX: 0, posY: 0, posZ: 0, rotX: 0, rotY: 0, rotZ: 0, color: "green", opacity: 1},
+    { name: "wallnumber2", height:200, width: 200, posX: -200, posY: 0, posZ: 200, rotX: 0, rotY: 0, rotZ: 0, color: "green", opacity: 0.8},
+    {name: "wall001", height: 200, width: 200, posX: -200, posY: 0, posZ: 0, rotX: 0, rotY: 0, rotZ: 0, color: "green", opacity: 1},
+    { name: "wallnumber3", height:200, width: 300, posX: 150, posY: 0, posZ: 200, rotX: 0, rotY: 0, rotZ: 0, color: "green", opacity: 0.8},
+    { name: "wallnumber4", height:200, width: 200, posX: 300, posY: 0, posZ: 100 , rotX: 0, rotY: 810, rotZ: 0, color: "green", opacity: 0.8},
+    { name: "wallnumber5", height:200, width: 200, posX: 300, posY: 0, posZ: -100 , rotX: 0, rotY: 810, rotZ: 0, color: "green", opacity: 0.8},
+    { name: "wallnumber6", height:200, width: 400, posX: 300, posY: 0, posZ: -400 , rotX: 0, rotY: 810, rotZ: 0, color: "green", opacity: 0.8},
+    { name: "wallnumber3", height:200, width: 600, posX: 0, posY: 0, posZ: -600, rotX: 0, rotY: 0, rotZ: 0, color: "grey", opacity: 0.8},
+    { name: "wallnumber2", height:200, width: 600, posX: -300, posY: 0, posZ: -100, rotX: 0, rotY: 90, rotZ: 0, color: "grey", opacity: 0.8}, 
+    { name: "wall001", height: 50, width: 100, posX: -50, posY: -75, posZ: 200, rotX: 0, rotY: 0, rotZ: 0, color: "grey", opacity: 0.8},
+    { name: "door", height: 150, width: 100, posX: -50, posY: 25, posZ: 200, rotX: 0, rotY: 0, rotZ: 0, color: "brown", opacity: 0.9, isDoor: true},
 ];
 
 function createWorld(map) {
@@ -31,11 +41,75 @@ function createWorld(map) {
             RotateY(${map[i].rotY}deg) 
             RotateZ(${map[i].rotZ}deg)
         `;
+
         myWorld.appendChild(mySquare);
     }
 }
 
-createWorld(lvl_one_map);   
+createWorld(lvl_one_map);
+
+let doorOpen = false;
+let doorAnim = null;
+const DOOR_OPEN_ANGLE = 90;
+
+function toggleDoor() {
+    const door = lvl_one_map.find(obj => obj.isDoor);
+    if (!door) return;
+
+    let dist = Math.sqrt(
+        (pawn.x - door.posX) ** 2 +
+        (pawn.z - door.posZ) ** 2
+    );
+    if (dist > 200) return;
+
+    doorOpen = !doorOpen;
+    animateDoor(door, doorOpen);
+}
+
+function animateDoor(door, open) {
+    if (door.hingeX === undefined){
+        door.hingeX = door.posX - door.width / 2;
+        door.hingeZ = door.posZ;
+    }
+
+    if (doorAnim){
+        clearInterval(doorAnim);
+        doorAnim = null;
+    }
+    let target = open ? DOOR_OPEN_ANGLE : 0;
+    let current = door.rotY;
+    let step = open ? 5 : -5;
+    let hingeX = door.posX - door.width / 2;
+    let hingeZ = door.posZ;
+
+    let anim = setInterval(() => {
+        current += step;
+
+        if ((open && current >= target) || (!open && current <= target)) {
+            current = target;
+            clearInterval(anim);
+        }
+
+        door.rotY = current;
+
+        door.posX = hingeX + (door.width / 2) * Math.cos(current * DEG);
+        door.posZ = hingeZ + (door.width / 2) * Math.sin(current *DEG);
+
+        let el = document.getElementById("door");
+        el.style.transform = `
+            translate3d(
+                ${door.posX + myWorld.clientWidth / 2 - door.width / 2}px,
+                ${door.posY + myWorld.clientHeight / 2 - door.height / 2}px,
+                ${-door.posZ}px
+            )
+            RotateX(${door.rotX}deg)
+            RotateY(${door.rotY}deg)
+            RotateZ(${door.rotZ}deg)
+        `;
+    
+    }, 16);
+}
+ 
 
 let dx = dy = dz = dry = 0;
 let pressUp = pressDown = pressLeft = pressRight = 0;
@@ -69,6 +143,7 @@ document.addEventListener("keydown", (e) => {
     if (e.code == "KeyA") {
         pressRight = pawn.vx;
     }
+    if (e.code == "KeyE") toggleDoor();
 });
 
 document.addEventListener("keyup", (e) => {
@@ -90,7 +165,6 @@ document.addEventListener("mousemove", (e) => {
     mouseX = e.movementX;
     mouseY = e.movementY;
 });
-
 
 myContainer.addEventListener("click", async () => {
   await myContainer.requestPointerLock({
@@ -129,6 +203,8 @@ function collision(mapObj, leadObj) {
     onGround = false;
     for (let i = 0; i < mapObj.length; i++) {
         //spēlētāja koordinātes katra taiststūra koordināšu sistēmā
+        if (mapObj[i].isDoor && doorOpen) continue;
+
         let x0 = (leadObj.x - mapObj[i].posX);
         let y0 = (leadObj.y - mapObj[i].posY);
         let z0 = (leadObj.z - mapObj[i].posZ);
