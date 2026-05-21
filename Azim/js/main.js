@@ -1,26 +1,18 @@
 const DEG = Math.PI / 180;
 var myContainer = document.getElementById("container");
 var myWorld = document.getElementById("world");
-var isJumping = false;
-var velocityY = 0;
-var gravity = 0.6; // Higher numbers make you fall faster
-var floorY = 0;    // Matches your world's resting camera/character Y position
-var sensitivity = 3; // Adjust this value to increase/decrease mouse sensitivity
+
+var lock;
 
 var lvl_one_map = [
-    { name: "floor", height: 2000, width: 2000, posX: 0, posY: 100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "violet", opacity: 0.5 , img: "./assets/floor.jpg" , bgsize: "15%"},
-    { name: "ceiling", height: 2000, width: 2000, posX: 0, posY: -100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "green", opacity: 0.5 , img : "./assets/roof.avif" , bgsize: "15%"},
-    { name: "right wall", height: 200, width: 2000, posX: 1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "blue", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "left wall", height: 200, width: 2000, posX: -1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "orange", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "front wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: 1000, rotX: 0, rotY: 0, rotZ: 0, color: "#ecc0d1", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "hinter wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: -1000, rotX: 0, rotY: 0, rotZ: 0, color: "yellow", opacity: 0.5 , img : "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "inner_wall_1", height: 200, width: 800, posX: -600, posY: 0, posZ: 400, rotX: 0, rotY: 0, rotZ: 0, color: "black", opacity: 1, img: "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "inner_wall_2", height: 200, width: 600, posX: 0, posY: 0, posZ: 200, rotX: 0, rotY: 90, rotZ: 0, color: "black", opacity: 1, img: "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "inner_wall_3", height: 200, width: 800, posX: 400, posY: 0, posZ: -400, rotX: 0, rotY: 0, rotZ: 0, color: "black", opacity: 1, img: "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "inner_wall_4", height: 200, width: 400, posX: -500, posY: 0, posZ: -200, rotX: 0, rotY: 90, rotZ: 0, color: "black", opacity: 1, img: "./assets/wall.jpg" , bgsize: "15%"},
-    { name: "inner_wall_5", height: 200, width: 600, posX: 300, posY: 0, posZ: 600, rotX: 0, rotY: 90, rotZ: 0, color: "black", opacity: 1, img: "./assets/wall.jpg" , bgsize: "15%"}
+    { name: "floor", height: 2000, width: 2000, posX: 0, posY: 100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "violet", opacity: 1, pattern: "url('assets/textures/grass.jpg')"},
+    { name: "ceiling", height: 2000, width: 2000, posX: 0, posY: -100, posZ: 0, rotX: 90, rotY: 0, rotZ: 0, color: "green", opacity: 0.5 },
+    { name: "right wall", height: 200, width: 2000, posX: 1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "blue", opacity: 0.5 },
+    { name: "left wall", height: 200, width: 2000, posX: -1000, posY: 0, posZ: 0, rotX: 0, rotY: 90, rotZ: 0, color: "orange", opacity: 0.5 },
+    // { name: "front wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: 1000, rotX: 0, rotY: 0, rotZ: 0, color: "#ecc0d1", opacity: 0.5 },
+    { name: "hinter wall", height: 200, width: 2000, posX: 0, posY: 0, posZ: -1000, rotX: 0, rotY: 0, rotZ: 0, color: "yellow", opacity: 0.5 },
+    { name: "wall001", height: 200, width: 200, posX: 0, posY: 0, posZ: 0, rotX: 0, rotY: 0, rotZ: 0, color: "black", opacity: 0.5}
 ];
-
 
 function createWorld(map) {
     for (let i = 0; i < map.length; i++) {  
@@ -29,10 +21,12 @@ function createWorld(map) {
         mySquare.style.position = "absolute";
         mySquare.style.height = `${map[i].height}px`;
         mySquare.style.width = `${map[i].width}px`;
-        mySquare.style.backgroundColor = map[i].color;
+        if (map[i].pattern) {
+            mySquare.style.backgroundImage = map[i].pattern;
+        } else {
+            mySquare.style.backgroundColor = map[i].color;
+        }
         mySquare.style.opacity = map[i].opacity;
-        mySquare.style.backgroundImage = `url(${map[i].img})`;
-        mySquare.style.backgroundSize = map[i].bgsize;
         mySquare.style.transform = `
             translate3d(
                 ${map[i].posX + myWorld.clientWidth / 2 - map[i].width / 2}px, 
@@ -103,17 +97,17 @@ document.addEventListener("mousemove", (e) => {
     mouseY = e.movementY;
 });
 
-window.addEventListener("keydown", function(event) {
-    if (event.code === "Space" && !isJumping) {
-        velocityY = -12; // Controls the jump height (tweak this value)
-        isJumping = true;
-    }
+document.addEventListener("pointerlockchange", (event) => {
+    lock = !lock;
 });
 
 myContainer.addEventListener("click", async () => {
-  await myContainer.requestPointerLock({
-    unadjustedMovement: true,
-  });
+    if (!lock) {
+        await myContainer.requestPointerLock({
+            unadjustedMovement: true,
+        });
+    } 
+        
 //   myContainer.style.width = "1920px";
 //   myContainer.style.height = "1200px";
 //   myContainer.requestFullscreen();
@@ -127,7 +121,7 @@ function update() {
     dx = (pressLeft - pressRight)*Math.cos(pawn.ry * DEG) + (pressUp - pressDown)*Math.sin(pawn.ry * DEG);
     dz = -(pressLeft - pressRight)*Math.sin(pawn.ry * DEG) + (pressUp - pressDown)*Math.cos(pawn.ry * DEG);
 
-    dry = mouseX / sensitivity;
+    dry = mouseX;
     drx = 0;
     mouseX = mouseY = 0;
 
@@ -135,8 +129,11 @@ function update() {
 
     pawn.z += dz;
     pawn.x += dx;
-    pawn.ry += dry;
-    pawn.rx -= drx;
+
+    if (lock) {
+        pawn.ry += dry;
+        pawn.rx -= drx;
+    }
 
     myWorld.style.transform = `translateZ(600px) RotateX(${pawn.rx}deg) RotateY(${pawn.ry}deg) translate3d(${-pawn.x}px, ${pawn.y}px, ${pawn.z}px) `;
 }
