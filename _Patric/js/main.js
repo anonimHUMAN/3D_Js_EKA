@@ -149,6 +149,11 @@ function update() {
         pawn.y += dy;
         pawn.ry += dry;
         pawn.rx -= drx;
+        if (pawn.rx > 57) {
+            pawn.rx = 57;
+        } else if (pawn.rx < -57) {
+            pawn.rx = -57;
+        }
     }
 
     myWorld.style.transform = `translateZ(600px) RotateX(${pawn.rx}deg) RotateY(${pawn.ry}deg) translate3d(${-pawn.x}px, ${-pawn.y}px, ${pawn.z}px) `;
